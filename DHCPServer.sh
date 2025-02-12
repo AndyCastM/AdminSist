@@ -88,13 +88,13 @@ sudo sed -i "s/INTERFACESv4=\"\"/INTERFACESv4=\"enp0s8\"/g" /etc/default/isc-dhc
 
 #Configurar el archivo dhcpd.conf
 sudo tee -a /etc/dhcp/dhcpd.conf > /dev/null <<EOF
-group red-interna{
-subnet "$(echo $ip | awk -F. {print $1"."$2"."$3}').0 netmask 255.255.255.0 {
-    range $inicio $fin;
-    option routers  {print $1"."$2"."$3}').1;
-    option domain-name-servers 8.8.8.8;
-}
-}
+echo "group red-interna {
+    subnet $(echo $ip | awk -F. '{print $1"."$2"."$3}').0 netmask 255.255.255.0 {
+        range $inicio $fin;
+        option routers $(echo $ip | awk -F. '{print $1"."$2"."$3}').1;
+        option domain-name-servers 8.8.8.8;
+    }
+}"
 EOF
 
 sudo service isc-dhcp-server restart
