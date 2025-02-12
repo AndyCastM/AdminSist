@@ -44,16 +44,17 @@ until validar_ip "$inicio"; do
     fi
 done
 
-until validar_ip "$fin"; do
+until false; do
     echo "Introduce la dirección IP de fin del rango de red:"
     read fin
 
     if validar_ip "$fin"; then
         if [[ "$fin" == "$inicio" ]]; then
             echo "La dirección IP de fin no puede ser igual a la dirección IP de incio. Intenta de nuevo."
-            continue
+        else
+            echo "IP válida: $fin"
+            break
         fi
-        echo "IP válida: $fin"
     else
         echo "IP inválida. Intenta de nuevo."
     fi
@@ -93,6 +94,9 @@ group red-interna {
         range $inicio $fin;
         option routers $(echo $ip | awk -F. '{print $1"."$2"."$3}').1;
         option domain-name-servers 8.8.8.8;
+        option domain-name "DHCP Server d Andrea";
+        default-lease-time 1800;   
+        max-lease-time 3600;       
     }
 }
 EOF
