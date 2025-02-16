@@ -33,12 +33,22 @@ until validar_ip "$ip"; do
 done
 
 #Pedir rangos de red
-until validar_ip "$inicio"; do
+until false; do
     echo "Introduce la dirección IP de inicio del rango de red:"
     read inicio
 
+    IFS='.' read -r -a partesi <<< "$ip"
+    ip_i="${partesi[0]}.${partesi[1]}.${partesi[2]}"
+    IFS='.' read -r -a partes <<< "$inicio"
+    ip_a="${partes[0]}.${partes[1]}.${partes[2]}"
+
     if validar_ip "$inicio"; then
-        echo "IP válida: $inicio"
+        if [[ "$ip_i" != "$ip_a" ]]; then
+            echo "Las direcciones IP deben pertenecer al mismo rango de red. Intenta de nuevo."
+        else
+            echo "IP válida: $inicio"
+            break
+        fi
     else
         echo "IP inválida. Intenta de nuevo."
     fi
@@ -48,12 +58,38 @@ until false; do
     echo "Introduce la dirección IP de fin del rango de red:"
     read fin
 
+    # Validar la IP de fin
     if validar_ip "$fin"; then
-        if [[ "$fin" == "$inicio" ]]; then
-            echo "La dirección IP de fin no puede ser igual a la dirección IP de incio. Intenta de nuevo."
+        # Dividir las IPs en partes usando '.' como delimitador
+        IFS='.' read -r -a partes2 <<< "$fin"
+        IFS='.' read -r -a partes <<< "$inicio"
+        # Obtener los últimos y primer octeto A
+        octeto_a=${partes[0]}
+        ultimo_octeto_inicio=${partes[3]}
+        ultimo_octeto_fin=${partes2[3]}
+
+        # Construir la IP base sin el último octeto
+        ip_b="${partes2[0]}.${partes2[1]}.${partes2[2]}"
+
+        if [[ "$octeto_a" -le 127 ]]; then
+            submask="255.0.0.0"
+        elif [[ "$octeto_a" -le 191 ]]; then
+            submask="255.255.0.0"
+        elif [[ "$octeto_a" -le 223 ]]; then
+            submask="255.255.255.0"
+        fi
+
+        # Validar que la IP de fin sea mayor que la de inicio
+        if [[ "$fin" == "$inicio" || "$ultimo_octeto_fin" -le "$ultimo_octeto_inicio" ]]; then
+            echo "La dirección IP de fin no puede ser igual o menor a la dirección IP de inicio. Intenta de nuevo."
         else
-            echo "IP válida: $fin"
-            break
+            # Validar que ambas IPs pertenezcan al mismo rango de red
+            if [[ "$ip_a" != "$ip_b" ]]; then
+                echo "Las direcciones IP deben pertenecer al mismo rango de red. Intenta de nuevo."
+            else
+                echo "IP válida: $fin"
+                break
+            fi
         fi
     else
         echo "IP inválida. Intenta de nuevo."
@@ -61,6 +97,7 @@ until false; do
 done
 
 echo "Rango de red: $inicio - $fin"
+echo "Mascara de subred: $submask"
 
 #Fijar una IP en netplan
 echo "network:
@@ -90,7 +127,7 @@ sudo sed -i "s/INTERFACESv4=\"\"/INTERFACESv4=\"enp0s8\"/g" /etc/default/isc-dhc
 #Configurar el archivo dhcpd.conf
 sudo tee -a /etc/dhcp/dhcpd.conf > /dev/null <<EOF
 group red-interna {
-    subnet $(echo $ip | awk -F. '{print $1"."$2"."$3}').0 netmask 255.255.255.0 {
+    subnet $(echo $ip | awk -F. '{print $1"."$2"."$3}').0 netmask $submask {
         range $inicio $fin;
         option routers $(echo $ip | awk -F. '{print $1"."$2"."$3}').1;
         option domain-name-servers 8.8.8.8;
