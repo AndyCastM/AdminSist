@@ -67,18 +67,6 @@ do {
     $ultimo_inicio = [int]($inicio -split "\.")[3]
     $ultimo_fin = [int]($fin -split "\.")[3]
 
-    $octeto_a = [int]($inicio -split "\.")[0]
-
-    if ($octeto_a -le 127){
-        $subnetmask = "255.0.0.0"
-    }
-    elseif ($octeto_a -le 191){
-        $subnetmask = "255.255.0.0"
-    }
-    elseif ($octeto_a -le 223){
-        $subnetmask = "255.255.255.0"
-    }
-
     if ($ultimo_fin -le $ultimo_inicio) {
         Write-Output "La IP de fin debe ser mayor a la IP de inicio."
         continue
@@ -111,7 +99,7 @@ Install-WindowsFeature -Name DHCP -IncludeManagementTools
 
 #Configurar un ambito IPv4
 Write-Host "Configurando ambito IPv4..." -ForegroundColor Green
-Add-DhcpServerv4Scope -Name "Red-Interna Andrea" -StartRange $inicio -EndRange $fin -SubnetMask $subnetmask -State Active
+Add-DhcpServerv4Scope -Name "Red-Interna Andrea" -StartRange $inicio -EndRange $fin -SubnetMask 255.255.255.0 -State Active
 
 #Configurar la puerta de enlace
 Write-Host "Configurando puerta de enlace..." -ForegroundColor Green

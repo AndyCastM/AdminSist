@@ -63,21 +63,12 @@ until false; do
         # Dividir las IPs en partes usando '.' como delimitador
         IFS='.' read -r -a partes2 <<< "$fin"
         IFS='.' read -r -a partes <<< "$inicio"
-        # Obtener los últimos y primer octeto A
-        octeto_a=${partes[0]}
+        # Obtener los últimos octetos de las IPs
         ultimo_octeto_inicio=${partes[3]}
         ultimo_octeto_fin=${partes2[3]}
 
         # Construir la IP base sin el último octeto
         ip_b="${partes2[0]}.${partes2[1]}.${partes2[2]}"
-
-        if [[ "$octeto_a" -le 127 ]]; then
-            submask="255.0.0.0"
-        elif [[ "$octeto_a" -le 191 ]]; then
-            submask="255.255.0.0"
-        elif [[ "$octeto_a" -le 223 ]]; then
-            submask="255.255.255.0"
-        fi
 
         # Validar que la IP de fin sea mayor que la de inicio
         if [[ "$fin" == "$inicio" || "$ultimo_octeto_fin" -le "$ultimo_octeto_inicio" ]]; then
@@ -97,7 +88,6 @@ until false; do
 done
 
 echo "Rango de red: $inicio - $fin"
-echo "Mascara de subred: $submask"
 
 #Fijar una IP en netplan
 echo "network:
@@ -127,7 +117,7 @@ sudo sed -i "s/INTERFACESv4=\"\"/INTERFACESv4=\"enp0s8\"/g" /etc/default/isc-dhc
 #Configurar el archivo dhcpd.conf
 sudo tee -a /etc/dhcp/dhcpd.conf > /dev/null <<EOF
 group red-interna {
-    subnet $(echo $ip | awk -F. '{print $1"."$2"."$3}').0 netmask $submask {
+    subnet $(echo $ip | awk -F. '{print $1"."$2"."$3}').0 netmask 255.255.255.0 {
         range $inicio $fin;
         option routers $(echo $ip | awk -F. '{print $1"."$2"."$3}').1;
         option domain-name-servers 8.8.8.8;
