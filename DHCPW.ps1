@@ -84,8 +84,6 @@ $ipscope = ($partes[0..2] -join ".") + ".0"
 $gateway = ($partes[0..2] -join ".") + ".1"
 
 Write-Host "Rangos de red $inicio - $fin" -ForegroundColor Green
-Write-Host "Submascara $subnetmask" -ForegroundColor Green
-
 Write-Host "Fijando IP..." -ForegroundColor Green
 New-NetIPAddress -IPAddress $ip -InterfaceAlias "Ethernet 2" -PrefixLength 24
 
