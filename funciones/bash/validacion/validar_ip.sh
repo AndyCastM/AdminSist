@@ -7,7 +7,7 @@ validar_ip() {
 
     if [[ $ip =~ $regex ]]; then
         IFS='.' read -r -a partes <<< "$ip"
-        if [[ "${partes[3]}" == "1" || "${partes[3]}" == "255" ]]; then
+        if [[ "${partes[3]}" == "0" || "${partes[3]}" == "1" || "${partes[3]}" == "255" ]]; then
             return 1  # IP no válida
         fi
         return 0  # IP válida
