@@ -5,9 +5,9 @@ function conf_dhcp {
         [string]$ipFin
     )
 
-    # Configuración de red
-    $ipscope = ($ipFija -split "\.")[0..2] -join "." + ".0"
-    $gateway = ($ipFija -split "\.")[0..2] -join "." + ".1"
+    $partes = $ipFija -split "\."
+    $ipscope = ($partes[0..2] -join ".") + ".0"
+    $gateway = ($partes[0..2] -join ".") + ".1"
 
     try {
         Write-Host "Configurando IP y servicio DHCP..." -ForegroundColor Green
@@ -30,9 +30,6 @@ function conf_dhcp {
         Write-Host "Configurando puerta de enlace..." -ForegroundColor Green
         Set-DhcpServerv4OptionValue -ScopeId $ipscope -OptionId 3 -Value $gateway -ErrorAction Stop
 
-        # Mostrar los ámbitos configurados
-        $scopes = Get-DhcpServerv4Scope
-
         Write-Host "Servicio DHCP configurado correctamente." -ForegroundColor Green
 
         # Retornar un objeto con los resultados
@@ -41,7 +38,7 @@ function conf_dhcp {
             IPFija = $ipFija
             Rango  = "$ipInicio - $ipFin"
             Gateway = $gateway
-            Scopes = $scopes
+            Scopes = $ipscope
         }
 
     } catch {

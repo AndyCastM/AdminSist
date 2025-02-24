@@ -14,6 +14,8 @@ fijar_ip(){
         addresses: [$ip/24]
         nameservers:
             addresses: [8.8.8.8, 1.1.1.1]" | sudo tee /etc/netplan/50-cloud-init.yaml > /dev/null
+
+    echo "Fijando la IP $ip en netplan"
     
     
     echo "Fijando la IP $ip en netplan"
