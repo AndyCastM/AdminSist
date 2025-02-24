@@ -5,6 +5,7 @@ source "./funciones/bash/entrada/solicitar_ip.sh"
 source "./funciones/bash/validacion/validar_rango.sh"
 source "./funciones/bash/configuracion/conf_dhcp.sh"
 source "./funciones/bash/entrada/solicitar_rango.sh"
+source "./funciones/bash/configuracion/fijar_ip.sh"
 
 #Usar la funcion leer ip y validarla
 echo "Introduce la IP a fijar"
@@ -16,7 +17,10 @@ ip_inicio=$(solicitar_rango "$ip_fija")
 echo "Introduce la IP de fin de subred"
 ip_fin=$(solicitar_rango2 "$ip_inicio")
 
-#conf_dhcp "$ip_fija" "$ip_inicio" "$ip_fin"
+#Fijar ip
+fijar_ip "$ip_fija"
+
+conf_dhcp "$ip_fija" "$ip_inicio" "$ip_fin"
 
 
 

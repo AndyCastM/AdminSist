@@ -23,35 +23,35 @@ conf_dns(){
     };
 EOF
 
-    #Crear zona directa
-    echo "Creando zona directa"
-    sudo tee /etc/bind/db.$dominio > /dev/null <<EOF
-    \$TTL    604800
-    @       IN      SOA     $dominio. root.$dominio. (
-                                2         ; Serial
-                            604800         ; Refresh
-                            86400         ; Retry
-                            2419200         ; Expire
-                            604800 )       ; Negative Cache TTL
-    ;
-    @       IN      NS      $dominio.
-    @       IN      A       $ip
-    www     IN      CNAME   $dominio.
+#Crear zona directa
+echo "Creando zona directa"
+sudo tee /etc/bind/db.$dominio > /dev/null <<EOF
+\$TTL    604800
+@       IN      SOA     $dominio. root.$dominio. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      $dominio.
+@       IN      A       $ip
+www     IN      CNAME   $dominio.
 EOF
 
-    #Crear zona inversa
-    echo "Creando zona inversa"
-    sudo tee /etc/bind/db.$(echo $ip | awk -F. '{print $3"."$2"."$1}') > /dev/null <<EOF
-    \$TTL    604800
-    @       IN      SOA     $dominio. root.$dominio. (
-                                2         ; Serial
-                            604800         ; Refresh
-                            86400         ; Retry
-                            2419200         ; Expire
-                            604800 )       ; Negative Cache TTL
-    ;
-    @       IN      NS      $dominio.
-    $(echo $ip | awk -F. '{print $4}')     IN      PTR     $dominio.
+#Crear zona inversa
+echo "Creando zona inversa"
+sudo tee /etc/bind/db.$(echo $ip | awk -F. '{print $3"."$2"."$1}') > /dev/null <<EOF
+\$TTL    604800
+@       IN      SOA     $dominio. root.$dominio. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      $dominio.
+$(echo $ip | awk -F. '{print $4}')     IN      PTR     $dominio.
 EOF
 
     #Editar resolv.conf para fijar la IP en el servidor DNS
