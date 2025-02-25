@@ -2,10 +2,9 @@
 
 #Importar funciones de lectura
 source "./funciones/bash/entrada/solicitar_ip.sh"
-source "./funciones/bash/validacion/validar_rango.sh"
-source "./funciones/bash/configuracion/conf_dhcp.sh"
 source "./funciones/bash/entrada/solicitar_rango.sh"
 source "./funciones/bash/configuracion/fijar_ip.sh"
+source "./funciones/bash/configuracion/conf_dhcp.sh"
 
 #Usar la funcion leer ip y validarla
 echo "Introduce la IP a fijar"

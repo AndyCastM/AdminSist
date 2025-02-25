@@ -1,12 +1,10 @@
 #!/bin/bash
 
 #Importar funciones de lectura
-source "./funciones/bash/entrada/solicitar_ip.sh"
-source "./funciones/bash/validacion/validar_rango.sh"
-source "./funciones/bash/configuracion/conf_dns.sh"
-source "./funciones/bash/entrada/solicitar_rango.sh"
-source "./funciones/bash/configuracion/fijar_ip.sh"
 source "./funciones/bash/entrada/solicitar_dom.sh"
+source "./funciones/bash/entrada/solicitar_ip.sh"
+source "./funciones/bash/configuracion/fijar_ip.sh"
+source "./funciones/bash/configuracion/conf_dns.sh"
 
 #Pedir dominio
 echo "Introduce el dominio"
