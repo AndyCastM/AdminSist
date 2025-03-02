@@ -1,11 +1,10 @@
 #!/bin/bash
 # funciones/bash/entrada/solicitar_user.sh
 
-source "./funciones/bash/validacion/validar_user.sh"
+source "./validacion/validar_user.sh"
 
 solicitar_user(){
     while true; do
-        echo "Ingresa el nombre de usuario:"
         read username
 
         if validar_user "$username"; then

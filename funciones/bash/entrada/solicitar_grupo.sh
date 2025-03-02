@@ -3,7 +3,6 @@
 
 solicitar_grupo(){
     while true; do
-        echo "Seleccione el grupo (1: Reprobados, 2: Recursadores):"
         read grupo
 
         if [[ "$grupo" == "1" ]]; then
