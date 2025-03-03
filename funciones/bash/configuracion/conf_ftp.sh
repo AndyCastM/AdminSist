@@ -22,7 +22,7 @@ conf_ftp(){
         sudo tee -a $VSFTPD_CONF > /dev/null <<EOF
         allow_writeable_chroot=YES
         anon_root=$FTP_ROOT/anon
-        ftp_banner=Welcome to Andrea's FTP Service
+        ftpd_banner=Welcome to Andrea's FTP Service
 EOF
 
         # Crear estructura de carpetas

@@ -15,7 +15,12 @@ crear_user(){
     # Crear usuario FTP
     echo "Creando usuario $FTP_USER..."
     sudo useradd -m -d "$USERS_DIR/$FTP_USER" -s /usr/sbin/nologin "$FTP_USER"
-    sudo passwd "$FTP_USER"
+
+    # Usar el nombre de usuario como contraseña
+    FTP_PASS="$FTP_USER"
+    echo "$FTP_USER:$FTP_PASS" | sudo chpasswd
+    echo "Tu contraseña es $FTP_USER. Es decir, la misma que tu usuario"
+    #sudo passwd "$FTP_USER"
     sudo usermod -aG "$FTP_GROUP" "$FTP_USER"
     sudo usermod -aG "ftpusers" "$FTP_USER"
 

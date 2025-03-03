@@ -2,7 +2,7 @@
 $ftpInstalled = Get-WindowsFeature Web-FTP-Server
 
 if ($ftpInstalled.Installed -eq $false) {
-    conf_ftp 
+    conf_ftp
 } else {
     Write-Host "Servidor FTP ya está instalado." -ForegroundColor Green
 }
@@ -29,17 +29,19 @@ while ($true) {
             if ($groupOption -eq "1") 
             {
                 CrearUsuarioFTP -username $username -password "$password" -groupName "reprobados"
+                # # Enlazar carpeta pública
+                cmd /c mklink /d "C:\ServidorFTP\LocalUser\Public\Publica" "C:\ServidorFTP\Publica"
+                Restart-WebItem "IIS:\Sites\ServidorFTP"
             }
             elseif ($groupOption -eq "2") {
                 CrearUsuarioFTP -username $username -password "$password" -groupName "recursadores"
+                # # Enlazar carpeta pública
+                cmd /c mklink /d "C:\ServidorFTP\LocalUser\Public\Publica" "C:\ServidorFTP\Publica"
+                Restart-WebItem "IIS:\Sites\ServidorFTP"
             }
             else {
                 Write-Host "Opcion de grupo no valida." -ForegroundColor Red            
             }
-
-            # Enlazar carpeta pública
-            cmd /c mklink /d "C:\ServidorFTP\LocalUser\Public\Publica" "C:\ServidorFTP\Publica"
-            Restart-WebItem "IIS:\Sites\ServidorFTP"
         }
         "2" {
         do {

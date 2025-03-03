@@ -12,7 +12,7 @@ solicitar_user(){
                 echo "$username"
                 return
             else 
-                 echo "Error: El usuario '$1' ya existe en el sistema." >&2
+                 echo "Error: El usuario '$username' ya existe en el sistema." >&2
             fi
         else
             echo "Error: El nombre de usuario no tiene un formato válido" >&2
