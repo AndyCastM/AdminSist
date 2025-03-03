@@ -7,6 +7,8 @@ source "./funciones/bash/entrada/solicitar_grupo.sh"
 source "./funciones/bash/entrada/solicitar_psswd.sh"
 source "./funciones/bash/configuracion/cambiar_user_grupo.sh"
 
+conf_ftp 
+
 while true; do
     echo "--- BIENVENIDO A LA CONFIGURACIÓN DE SU SERVIDOR FTP ---"
     echo "1. Crear usuario"
@@ -23,6 +25,10 @@ while true; do
         2)  
             echo "--- CAMBIAR DE GRUPO A USUARIO ---"
             cambiar_user_grupo
+            ;;
+        3)
+            echo "SALIENDO..."
+            exit
             ;;
         *)
             echo "OPCIÓN INVÁLIDA"

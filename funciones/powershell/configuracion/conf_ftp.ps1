@@ -23,7 +23,6 @@ function conf_ftp (){
 
     Import-Module WebAdministration
 
-
     # Crear directorios
     Write-Host "Creando directorios..." -ForegroundColor Cyan
     New-Item -ItemType Directory -Path "C:\ServidorFTP\" -Force
@@ -58,14 +57,8 @@ function conf_ftp (){
     Remove-WebConfigurationProperty -PSPath IIS:\ -Location "$nameServer/Reprobados" -Filter "system.ftpServer/security/authorization" -Name "."
     Remove-WebConfigurationProperty -PSPath IIS:\ -Location "$nameServer/Recursadores" -Filter "system.ftpServer/security/authorization" -Name "."
 
-    # Eliminar cualquier configuración anterior de acceso anónimo
-    Clear-WebConfiguration "/system.ftpServer/security/authorization" -PSPath IIS:\ -Location "$nameserver/Publica"
-
-    # Permitir acceso anónimo SOLO de lectura
-    Add-WebConfiguration "/system.ftpServer/security/authorization" -Value @{accessType="Allow";users="anonymous";permissions=1} -PSPath IIS:\ -Location "$nameserver/Publica"
-
-    # Bloquear explícitamente la escritura y modificación para anónimos
-    Add-WebConfiguration "/system.ftpServer/security/authorization" -Value @{accessType="Deny";users="anonymous";permissions=6} -PSPath IIS:\ -Location "$nameserver/Publica"
+    # Da privilegios de lectura a todos los usuarios contando anónimos dentro de la carpeta "General"
+    Add-WebConfiguration "/system.ftpServer/security/authorization" -Value @{accessType="Allow";users="*";permissions=1} -PSPath IIS:\ -Location "$nameServer/Publica"
 
     # Permitir acceso completo solo a usuarios registrados en Publica
     Add-WebConfiguration "/system.ftpServer/security/authorization" -Value @{accessType="Allow";roles="reprobados";permissions=3} -PSPath IIS:\ -Location "$nameserver/Publica"
