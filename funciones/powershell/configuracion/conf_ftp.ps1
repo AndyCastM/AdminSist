@@ -102,7 +102,7 @@ function conf_ftp (){
 
     $thumbprint = $cert.Thumbprint
 
-    # Permitir la autenticación con SSL (opcional, según tus necesidades de seguridad)
+    # Permitir la autenticación con SSL 
     Set-ItemProperty "IIS:\Sites\$nameServer" -Name ftpServer.security.authentication.basicAuthentication.enabled -Value 1
     Set-ItemProperty "IIS:\Sites\$nameServer" -Name ftpServer.security.authentication.anonymousAuthentication.enabled -Value 1
 
