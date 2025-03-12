@@ -17,9 +17,11 @@ menu_http2(){
     
     if [ "$service" = "Apache" ]; then
         echo "1. Versión Estable - $stable"
+        echo "2. Versión de Desarrollo no Disponible - 2 para Regresar"
     elif [ "$service" = "Nginx" ] || [ "$service" = "OpenLiteSpeed" ]; then
         echo "1. Versión Estable - $stable"
         echo "2. Versión Mainline (En desarrollo) - $mainline"
+        echo "3. Regresar"
     else 
         echo "Opción no válida"
         exit 1

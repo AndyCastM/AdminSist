@@ -4,6 +4,14 @@ source "./menu/menu_http.sh"
 source "./configuracion/obtener_version.sh"
 source "./entrada/solicitar_ver.sh"
 source "./entrada/solicitar_puerto.sh"
+source "./configuracion/conf_http.sh"
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Este script debe ejecutarse como root" 
+    exit 1
+fi
+
+sudo apt install net-tools -y > /dev/null 2>&1
 
 while true; do
     menu_http
@@ -15,8 +23,12 @@ while true; do
         menu_http2 "Apache" "$stable" " "
         echo "Elija la versión que desea instalar: "
         op2=$(solicitar_ver "Apache") 
-        echo "Ingresa el puerto:"   
-        port=$(solicitar_puerto)
+        if [ "$op2" -eq 1 ]; then
+            port=$(solicitar_puerto)
+            conf_apache "$port" "$stable"
+        elif [ "$op2" -eq 2 ]; then
+            continue
+        fi
     elif [ "$op" -eq 2 ]; then
         versions=$(obtener_version "Nginx")
         stable=$(echo "$versions" | tail -n 2 | head -1)
@@ -24,8 +36,15 @@ while true; do
         menu_http2 "Nginx" "$stable" "$mainline"
         echo "Elija la versión que desea instalar: "
         op2=$(solicitar_ver "Nginx")
-        echo "Ingresa el puerto:"   
-        port=$(solicitar_puerto)
+        if [ "$op2" -eq 1 ]; then  
+            port=$(solicitar_puerto)
+            conf_nginx "$port" "$stable"
+        elif [ "$op2" -eq 2 ]; then
+            port=$(solicitar_puerto)
+            conf_nginx "$port" "$mainline"
+        elif [ "$op2" -eq 3 ]; then
+            continue
+        fi
     elif [ "$op" -eq 3 ]; then
         versions=$(obtener_version "OpenLiteSpeed")
         stable=$(echo "$versions" | tail -n 2 | head -1)
@@ -33,8 +52,15 @@ while true; do
         menu_http2 "OpenLiteSpeed" "$stable" "$mainline"
         echo "Elija la versión que desea instalar: "
         op2=$(solicitar_ver "OpenLiteSpeed")
-        echo "Ingresa el puerto:"   
-        port=$(solicitar_puerto)
+        if [ "$op2" -eq 1 ]; then
+            port=$(solicitar_puerto)
+            conf_litespeed "$port" "$stable"
+        elif [ "$op2" -eq 2 ]; then 
+            port=$(solicitar_puerto)
+            conf_litespeed "$port" "$mainline"
+        elif [ "$op2" -eq 3 ]; then
+            continue
+        fi
     elif [ "$op" -eq 4 ]; then
         echo "Saliendo..."
         exit 0
