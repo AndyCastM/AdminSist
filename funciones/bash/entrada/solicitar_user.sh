@@ -6,6 +6,7 @@ source "./validacion/validar_user.sh"
 solicitar_user(){
     while true; do
         read username
+        [[ -z "$username" ]] && return
 
         if validar_user "$username"; then
             if validar_user_existente "$username"; then

@@ -4,35 +4,51 @@
 cambiar_user_grupo() {
     local FTP_USER NEW_GROUP
 
-    # Pedir el nombre del usuario
-    echo "Ingrese el nombre del usuario que desea cambiar de grupo:"
-    read FTP_USER
+    while true; do
+        # Pedir el nombre del usuario
+        read -p "Ingrese el nombre del usuario que desea cambiar de grupo: " FTP_USER
 
-    # Verificar si el usuario existe
-    if ! id "$FTP_USER" &>/dev/null; then
-        echo "Error: El usuario '$FTP_USER' no existe."
-        return 1
-    fi
+        if [[ -z "$FTP_USER" ]]; then
+            echo "Operación cancelada."
+            return
+        fi
 
-    # Pedir el nuevo grupo
-    echo "Seleccione el nuevo grupo:"
-    echo "1) Reprobados"
-    echo "2) Recursadores"
-    read opc
-
-    case $opc in
-        1)
-            NEW_GROUP="reprobados"
-            ;;
-        2)
-            NEW_GROUP="recursadores"
-            ;;
-        *)
-            echo "Error: Opción inválida."
+        # Verificar si el usuario existe
+        if ! id "$FTP_USER" &>/dev/null; then
+            echo "Error: El usuario '$FTP_USER' no existe."
             return 1
-            ;;
-    esac
+        fi
 
+        break  # Salir del bucle si el usuario es válido
+    done
+
+    while true; do
+        # Pedir el nuevo grupo
+        echo "Seleccione el nuevo grupo:"
+        echo "1) Reprobados"
+        echo "2) Recursadores"
+        read -p "Opción: " opc
+
+        if [[ -z "$opc" ]]; then
+            echo "Operación cancelada."
+            return
+        fi
+
+        case "$opc" in
+            1)
+                NEW_GROUP="reprobados"
+                break
+                ;;
+            2)
+                NEW_GROUP="recursadores"
+                break
+                ;;
+            *)
+                echo "Error: Opción inválida. Por favor, ingrese 1 o 2."
+                ;;
+        esac
+    done
+    
     GROUPS_DIR="/home/ftp/grupos"
     USER_DIR="/home/ftp/users/$FTP_USER"
     CURRENT_GROUP=$(ls "$USER_DIR" | grep -E "reprobados|recursadores")

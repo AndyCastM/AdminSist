@@ -3,10 +3,12 @@
 
 solicitar_puerto() {
     local port
-    local puertos_reservados=(1433 1434 1521 2049 3128 3306 3389 5432 6000 6379 27017 8000 8080 8888)
+    local puertos_reservados=(1433 1434 1521 2049 3128 3306 3389 5432 6000 6379 6660 6661 6662 6663 6664 6665 6666 6667 6668 6669 27017 8000 8080 8888)
     #21 22 23 25 53 67 68 80 110 137 138 139 143 161 162 389 443 465 993 995 
     while true; do
         read -p "Introduce un puerto válido (1024-65535): " port
+
+        [[ -z "$port" ]] && return
 
         # Verificar si el input es un número y está en el rango permitido
         if ! [[ "$port" =~ ^[0-9]+$ ]] || [ "$port" -lt 1024 ] || [ "$port" -gt 65535 ]; then

@@ -6,6 +6,7 @@ function conf_IIS {
         Install-WindowsFeature -Name Web-Server -IncludeManagementTools
     }
 
+    Write-Host "Configurando IIS... " -ForegroundColor Green
     # Habilitar el puerto en el firewall
     New-NetFirewallRule -DisplayName "IIS Port $port" -Direction Inbound -Action Allow -Protocol TCP -LocalPort $port -ErrorAction SilentlyContinue
 

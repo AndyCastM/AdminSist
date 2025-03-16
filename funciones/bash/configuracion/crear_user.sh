@@ -1,13 +1,7 @@
 #!/bin/bash
 # funciones/bash/configuracion/crear_user.sh
-
+source "./variables/variables_ftp.sh"
 crear_user(){
-    # Variables principales
-    FTP_ROOT="/home/ftp"
-    PUBLIC_DIR="$FTP_ROOT/publica"
-    USERS_DIR="$FTP_ROOT/users"
-    GROUPS_DIR="$FTP_ROOT/grupos"
-    VSFTPD_CONF="/etc/vsftpd.conf"
 
     local FTP_USER="$1"
     local FTP_GROUP="$2"

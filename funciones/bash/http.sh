@@ -25,6 +25,9 @@ while true; do
         op2=$(solicitar_ver "Apache") 
         if [ "$op2" -eq 1 ]; then
             port=$(solicitar_puerto)
+            if [[ -z "$port" ]]; then
+                continue
+            fi
             conf_apache "$port" "$stable"
         elif [ "$op2" -eq 2 ]; then
             continue
@@ -38,9 +41,15 @@ while true; do
         op2=$(solicitar_ver "Nginx")
         if [ "$op2" -eq 1 ]; then  
             port=$(solicitar_puerto)
+            if [[ -z "$port" ]]; then
+                continue
+            fi
             conf_nginx "$port" "$stable"
         elif [ "$op2" -eq 2 ]; then
             port=$(solicitar_puerto)
+            if [[ -z "$port" ]]; then
+                continue
+            fi
             conf_nginx "$port" "$mainline"
         elif [ "$op2" -eq 3 ]; then
             continue
@@ -54,9 +63,15 @@ while true; do
         op2=$(solicitar_ver "OpenLiteSpeed")
         if [ "$op2" -eq 1 ]; then
             port=$(solicitar_puerto)
+            if [[ -z "$port" ]]; then
+                continue
+            fi
             conf_litespeed "$port" "$stable"
         elif [ "$op2" -eq 2 ]; then 
             port=$(solicitar_puerto)
+            if [[ -z "$port" ]]; then
+                continue
+            fi
             conf_litespeed "$port" "$mainline"
         elif [ "$op2" -eq 3 ]; then
             continue

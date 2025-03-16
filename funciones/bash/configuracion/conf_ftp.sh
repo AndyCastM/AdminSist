@@ -22,6 +22,9 @@ conf_ftp(){
         sudo tee -a $VSFTPD_CONF > /dev/null <<EOF
         allow_writeable_chroot=YES
         anon_root=$FTP_ROOT/anon
+        anon_umask=022
+        local_umask=002
+        ftpd_banner=Welcome to Andrea's FTP server
 EOF
 
         # Crear estructura de carpetas
@@ -39,8 +42,7 @@ EOF
         sudo chown root:recursadores "$GROUPS_DIR/recursadores"
 
         # Permisos generales
-        sudo chmod 755 /home/ftp
-        sudo chmod 775 "$PUBLIC_DIR"
+        sudo chmod 2775 "$PUBLIC_DIR"
         sudo chown root:ftpusers "$PUBLIC_DIR"
 
         # Asegurar configuración del sistema

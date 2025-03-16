@@ -5,6 +5,8 @@ solicitar_grupo(){
     while true; do
         read grupo
 
+        [[ -z "$grupo" ]] && return
+        
         if [[ "$grupo" == "1" ]]; then
             GROUP="reprobados"
             echo "$GROUP"
