@@ -27,3 +27,10 @@ menu_http2(){
         exit 1
     fi
 }
+
+menu_http3(){
+    echo "--- MODOS DE INSTALACIÓN ---"
+    echo "1) Instalación desde Web"
+    echo "2) Instalación desde FTP"
+    echo "3) Salir"
+}
