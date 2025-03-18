@@ -7,16 +7,22 @@ source "./configuracion/instalar_dependenciashttp.sh"
 conf_litespeed(){
     local port="$1"
     local version="$2"
-    echo "Descargando $version..."
+    local ftp="$3"
 
-    cd /tmp
-    # Variable URL para descargar la version
-    #url="https://openlitespeed.org/packages/"$version".tgz"
-    url="${url_litespeed_descargas}$version.tgz"
+    if [[ "$ftp" -eq 1 ]]; then
+        cd /tmp  
+    else
+        echo "Descargando $version..."
 
-    wget -O litespeed.tgz "$url"
+        cd /tmp
+        # Variable URL para descargar la version
+        #url="https://openlitespeed.org/packages/"$version".tgz"
+        url="${url_litespeed_descargas}$version.tgz"
+
+        wget -O $version.tgz "$url"
+    fi
     #Extraer archivos
-    tar -xzf litespeed.tgz > /dev/null 2>&1
+    tar -xzf $version.tgz > /dev/null 2>&1
     #Cambiar de directorio e instalar
     cd openlitespeed
 
@@ -44,12 +50,18 @@ conf_litespeed(){
 conf_apache(){
     local port="$1"
     local version="$2"
-    echo "Descargando Apache $version..."
+    local ftp="$3"
 
-    #Descargar e instalar la versión seleccionada
-    cd /tmp
-    url="${url_apache_descargas}httpd-$version.tar.gz"
-    wget "$url"
+    if [[ "$ftp" -eq 1 ]]; then
+        cd /tmp 
+    else
+        echo "Descargando Apache $version..."
+
+        #Descargar e instalar la versión seleccionada
+        cd /tmp
+        url="${url_apache_descargas}httpd-$version.tar.gz"
+        wget "$url"
+    fi
     tar -xzvf httpd-$version.tar.gz > /dev/null 2>&1
     cd httpd-$version
 
@@ -73,12 +85,19 @@ conf_apache(){
 conf_nginx(){
     local port="$1"
     local version="$2"
-    echo "Descargando Nginx $version..."
+    local ftp="$3"
 
-    #Descargar e instalar la versión seleccionada
-    cd /tmp
-    url="${url_nginx_descargas}nginx-$version.tar.gz"
-    wget -q "$url"
+    if [[ "$ftp" -eq 1 ]]; then
+        cd /tmp   
+    else
+        echo "Descargando Nginx $version..."
+
+        #Descargar e instalar la versión seleccionada
+        cd /tmp
+        url="${url_nginx_descargas}nginx-$version.tar.gz"
+        wget -q "$url"
+    fi
+
     #wget https://nginx.org/download/nginx-$version.tar.gz
     tar -xzvf nginx-$version.tar.gz > /dev/null 2>&1
     cd nginx-$version

@@ -24,7 +24,7 @@ ftp_http(){
         echo "Creando estructura de directorios..."
         sudo mkdir -p "/srv/ftp/Windows/Apache"
         sudo mkdir -p "/srv/ftp/Windows/Nginx"
-        sudo mkdir -p "/srv/ftp/Windows/IIS"
+        #sudo mkdir -p "/srv/ftp/Windows/IIS"
         sudo mkdir -p "/srv/ftp/Linux/Apache"
         sudo mkdir -p "/srv/ftp/Linux/Nginx"
         sudo mkdir -p "/srv/ftp/Linux/OpenLiteSpeed"
@@ -86,24 +86,5 @@ ftp_http(){
         #Nginx para Windows
         sudo wget -P /srv/ftp/Windows/Nginx https://nginx.org/download/nginx-1.27.4.zip
         sudo wget -P /srv/ftp/Windows/Nginx https://nginx.org/download/nginx-1.26.3.zip
-
-        #PARA CLIENTE LINUX 
-        #Listar carpetas (Servicios Http)
-        curl -s --user ftplinux:linux ftp://10.0.0.16 | awk '{print $NF}'
-        #Listar contenido de Apache
-        curl -s --user ftplinux:linux ftp://10.0.0.16/Apache/ | awk '{print $NF}'
-        #Listar contenido de Nginx
-        curl -s --user ftplinux:linux ftp://10.0.0.16/Nginx/ | awk '{print $NF}'
-        #Listar contenido de OpenLiteSpeed
-        curl -s --user ftplinux:linux ftp://10.0.0.16/OpenLiteSpeed/ | awk '{print $NF}'
-
-        #Descargar Apache
-        wget --user=ftplinux --password=linux ftp://10.0.0.16/Apache/httpd-2.4.63.tar.gz -O /tmp/httpd-2.4.63.tar.gz
-        #Descargar Nginx
-        wget --user=ftplinux --password=linux ftp://10.0.0.16/Nginx/nginx-1.27.4.tar.gz -O /tmp/nginx-1.27.4.tar.gz
-        wget --user=ftplinux --password=linux ftp://10.0.0.16/Nginx/nginx-1.26.3.tar.gz -O /tmp/nginx-1.26.3.tar.gz
-        #Descargar OpenLiteSpeed
-        wget --user=ftplinux --password=linux ftp://10.0.0.16/OpenLiteSpeed/openlitespeed-1.7.19.tgz -O /tmp/openlitespeed-1.7.19.tgz
-        wget --user=ftplinux --password=linux ftp://10.0.0.16/OpenLiteSpeed/openlitespeed-1.8.3.tgz -O /tmp/openlitespeed-1.8.3.tgz
     fi  
 }

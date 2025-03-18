@@ -88,9 +88,7 @@ cert_nginx() {
 
 
 cert_ols() {
-    local port="${1:-443}"
-    local ols_dir="/usr/local/lsws/conf/ssl"
-    local ols_conf="/usr/local/lsws/conf/httpd_config.conf"
+    local port="$1"
     local vh_conf="/usr/local/lsws/conf/vhosts/Example/vhconf.conf"
 
     # Crear directorio para SSL si no existe
@@ -130,16 +128,6 @@ EOL
     indexFiles index.html\n\
     ' "$vh_conf"
     fi
-
-    # Verificar que la carpeta de documentos existe
-    if [[ ! -d "/var/www/html" ]]; then
-        sudo mkdir -p /var/www/html
-        echo "<h1>OpenLiteSpeed funciona correctamente</h1>" | sudo tee /var/www/html/index.html
-    fi
-
-    # Ajustar permisos para OpenLiteSpeed
-    sudo chown -R nobody:nogroup /var/www/html
-    sudo chmod -R 755 /var/www/html
 
     # Permitir tráfico HTTPS en el firewall
     sudo ufw allow $port/tcp

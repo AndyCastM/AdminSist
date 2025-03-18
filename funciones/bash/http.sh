@@ -1,11 +1,13 @@
 #!/bin/bash
 
 source "./menu/menu_http.sh"
+source "./menu/menu_cert.sh"
 source "./configuracion/obtener_version.sh"
 source "./entrada/solicitar_ver.sh"
 source "./entrada/solicitar_puerto.sh"
 source "./configuracion/conf_http.sh"
 source "./configuracion/conf_CERTHTTP.sh"
+source "./entrada/solicitar_cert.sh"
 
 if [[ $EUID -ne 0 ]]; then
     echo "Este script debe ejecutarse como root" 
@@ -15,11 +17,10 @@ fi
 sudo apt install net-tools -y > /dev/null 2>&1
 
 http(){
-    local cert="${1:-0}"  # Si no se pasa argumento, cert es 0
     while true; do
         menu_http
         read -p "Elija el servicio HTTP que desea configurar (1-3): " op
-                
+        [[ -z "$op" ]] && return      
         if [ "$op" -eq 1 ]; then
             versions=$(obtener_version "Apache")
             stable=$(echo "$versions" | head -1)
@@ -32,8 +33,12 @@ http(){
                     continue
                 fi
                 conf_apache "$port" "$stable"
+                menu_cert
+                cert=$(solicitar_cert)
                 if [ "$cert" -eq 1 ]; then
                     cert_apache "$port"
+                else
+                    continue
                 fi
             elif [ "$op2" -eq 2 ]; then
                 continue
@@ -60,8 +65,12 @@ http(){
             elif [ "$op2" -eq 3 ]; then
                 continue
             fi
+            menu_cert
+            cert=$(solicitar_cert)
             if [ "$cert" -eq 1 ]; then
                 cert_nginx "$port"
+            else
+                continue
             fi
         elif [ "$op" -eq 3 ]; then
             versions=$(obtener_version "OpenLiteSpeed")
@@ -85,8 +94,12 @@ http(){
             elif [ "$op2" -eq 3 ]; then
                 continue
             fi
+            menu_cert
+            cert=$(solicitar_cert)
             if [ "$cert" -eq 1 ]; then
                 cert_ols "$port"
+            else
+                continue
             fi
         elif [ "$op" -eq 4 ]; then
             echo "Saliendo..."
