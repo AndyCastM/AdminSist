@@ -16,9 +16,10 @@ fi
 while true; do
     menu_http3
 
-    read -p "Elija una opción (1-3): " op2
+    read -p "Elija una opción (1-2): " op2
     case "$op2" in
         1)
+            echo "Opción 1 seleccionada: Web"
             http
             ;;
         2)
