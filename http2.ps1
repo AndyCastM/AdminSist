@@ -117,7 +117,7 @@ while ($true) {
                                             
                         if ($op2 -eq "1") {
                             Write-Host "Configurando certificado SSL..."
-                            cert_apache -port "$port"
+                            cert_nginx -port "$port"
                         } else {
                             Write-Host "No se configurará SSL."
                         }

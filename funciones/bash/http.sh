@@ -103,7 +103,7 @@ http(){
             fi
         elif [ "$op" -eq 4 ]; then
             echo "Saliendo..."
-            exit 0
+            return
         else
             echo "Opción no válida. Intente de nuevo."
         fi

@@ -1,4 +1,3 @@
-
 function listar_http {
     param (
         [string]$ftpServer,
@@ -30,12 +29,9 @@ function listar_http {
         # Cerrar conexiones
         $reader.Close()
         $response.Close()
-
-        Write-Host "Contenido de '$directory':"
-
-        # Limpiar nombres de archivos quitando el prefijo del directorio
         $cleanFileList = $fileList | ForEach-Object { ($_ -replace '^.*/', '').Trim() }
-        $cleanFileList | ForEach-Object { Write-Host $_ }
+
+        return $cleanFileList
     }
     catch {
         Write-Host "Error al acceder a '$directory': $_" -ForegroundColor Red

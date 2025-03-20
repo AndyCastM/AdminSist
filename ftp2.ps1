@@ -78,9 +78,9 @@ while ($true) {
             } 
         }
         "2" {
-            while ($true) {
+            do{
                 $username = Read-Host "Ingrese nombre de usuario"
-                
+            
                 # Si el usuario no ingresa nada, salir del menú
                 if ([string]::IsNullOrEmpty($username)) {
                     Write-Host "Operacion cancelada." -ForegroundColor Yellow
@@ -92,29 +92,33 @@ while ($true) {
                     break
                 } else {
                     Write-Host "El usuario NO existe. Intente de nuevo." -ForegroundColor Red
-                }       
-
-                Write-Host "Seleccione el grupo:"
-                Write-Host "1) Reprobados"
-                Write-Host "2) Recursadores"
-                $newGroup = Read-Host "Nuevo grupo:"
-                if ([string]::IsNullOrEmpty($newGroup)){
-                    Write-Host "Operacion cancelada." -ForegroundColor Yellow
-                    break
                 }
-                    
-                if ($newGroup -eq "1") 
-                {
-                    CambiarGrupo -username $username -newGroup "reprobados"       
-                    break     
-                }
-                elseif ($newGroup -eq "2") {
-                    CambiarGrupo -username $username -newGroup "recursadores"    
-                    break        
-                }
-                else {
-                    Write-Host "Opcion de grupo no valida." -ForegroundColor Red            
-                }
+            } while ($true)
+     
+            if (UsuarioExiste $username) {
+                do {
+                    Write-Host "Seleccione el grupo:"
+                    Write-Host "1) Reprobados"
+                    Write-Host "2) Recursadores"
+                    $newGroup = Read-Host "Nuevo grupo:"
+                    if ([string]::IsNullOrEmpty($newGroup)){
+                        Write-Host "Operacion cancelada." -ForegroundColor Yellow
+                        break
+                    }
+                        
+                    if ($newGroup -eq "1") 
+                    {
+                        CambiarGrupo -username $username -newGroup "reprobados"       
+                        break     
+                    }
+                    elseif ($newGroup -eq "2") {
+                        CambiarGrupo -username $username -newGroup "recursadores"    
+                        break        
+                    }
+                    else {
+                        Write-Host "Opcion de grupo no valida." -ForegroundColor Red            
+                    }
+                } while ($true)
             }
         }
         "3" {

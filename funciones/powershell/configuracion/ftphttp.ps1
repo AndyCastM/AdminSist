@@ -1,157 +1,119 @@
 function ftphttp {
+    $ftpServer = "10.0.0.17"
     $ftpUser = "ftpwindows"
     $ftpPass = "windows"
     $credentials = New-Object System.Net.NetworkCredential($ftpUser, $ftpPass)
-    # Listar servicios disponibles
-    $services = get_FTPList 
+
+    # Obtener la lista de servicios disponibles en el FTP
+    $services = get_FTPList | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+    
     if ($services.Count -eq 0) {
         Write-Host "No se encontraron servicios en el FTP." -ForegroundColor Red
         return
     }
 
-    # Limpiar nombres de servicios para evitar espacios en blanco
-    $services = $services | ForEach-Object { $_.Trim() }
-
-    # Mostrar las opciones disponibles
     Write-Host "`n= CONFIGURACION DE SERVICIOS HTTP DISPONIBLES =" -ForegroundColor Cyan
     for ($i = 0; $i -lt $services.Count; $i++) {
         Write-Host "$($i+1). $($services[$i])"
     }
 
-    # Seleccionar servicio
-    $op = Read-Host "Elija una opcion (1-2), o escriba 0 para salir"
-    if ($op -eq "0") 
-    { Write-Host "Saliendo..." -ForegroundColor Yellow; return }
-    elseif ($op -eq "1"){
-        Write-Host "= Apache =" -ForegroundColor DarkCyan
-        $ftpServer = "10.0.0.17"
-        $ftpUser = "ftpwindows"
-        $ftpPass = "windows"
-        $directory = "Apache"
-        listar_http -ftpServer $ftpServer -ftpUser $ftpUser -ftpPass $ftpPass -directory $directory
-        do {
-            $op2 = Read-Host "Desea instalar Apache? 1-Si, 2-No"
-            if ($op2 -match "^[12]$") {
-                break
-            } else {
-                Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
-            }
-        } while ($true)
-
-        if ($op2 -eq "2") 
-        { Write-Host "Saliendo..." -ForegroundColor Yellow; return }
-
-        $port = solicitar_puerto "Ingresa el puerto para Apache (1024-65535)"
-        if ([string]::IsNullOrEmpty($port)){
+    do {
+        $op = Read-Host "Elija una opcion (1-$($services.Count)), o escriba 0 para salir"
+        if ($op -eq "0") { 
+            Write-Host "Saliendo..." -ForegroundColor Yellow
             return
         }
-
-        $ftpFileUrl = "ftp://$ftpServer/$directory/httpd-2.4.63-250207-win64-VS17.zip"
-        $dZip = "$env:USERPROFILE\Downloads\apache-2.4.63.zip"
-        $extdestino = "C:\Apache24"
-        $webClient = New-Object System.Net.WebClient
-        $webClient.Credentials = $credentials
-        $webClient.DownloadFile($ftpFileUrl, $dZip)
-        Expand-Archive -Path $dZip -DestinationPath "C:\" -Force
-        $configFile = Join-Path $extdestino "conf\httpd.conf"
-        if (Test-Path $configFile) {
-            (Get-Content $configFile) -replace "Listen 80", "Listen $port" | Set-Content $configFile
-            Write-Host "Configuración actualizada para escuchar en el puerto $port" -ForegroundColor Green
+        if ($op -match "^\d+$" -and [int]$op -le $services.Count) {
+            break
         } else {
-            Write-Host "Error: No se encontró el archivo de configuración en $configFile"
-            return
+            Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
         }
-        
-        $apacheExe = Get-ChildItem -Path $extdestino -Recurse -Filter httpd.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($apacheExe) {
-            $exeApache = $apacheExe.FullName
-            #Write-Host "Instalando Apache como servicio..." -ForegroundColor Green
-            # Instalar Apache como un servicio de Windows
-            Start-Process -FilePath $exeApache -ArgumentList '-k', 'install', '-n', 'Apache24' -NoNewWindow -Wait
-            Write-Host "Iniciando Apache..." -ForegroundColor Green
-            Start-Service -Name "Apache24"
-            Write-Host "Apache instalado y ejecutándose correctamente en el puerto $:port" -ForegroundColor Green
+    } while ($true)
 
-            # Habilitar el puerto en el firewall al final de la instalación
-            New-NetFirewallRule -DisplayName "Abrir Puerto $port" -Direction Inbound -Protocol TCP -LocalPort $port -Action Allow
-        } else {
-            Write-Host "Error: No se encontró el ejecutable httpd.exe en $extdestino"
-        }
+    $selectedService = $services[$op - 1]
+    Write-Host "= $selectedService =" -ForegroundColor DarkCyan
 
-        menu_cert
-        do {
-            $op2 = Read-Host "Elija una opcion (1-2)"
-            if ($op2 -match "^[12]$") {
-                break
-            } else {
-                Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
-            }
-        } while ($true)
-                                
-        Write-Host "Opcion seleccionada: $op2"
-                                
-        if ($op2 -eq "1") {
-            Write-Host "Configurando certificado SSL..."
-            cert_apache -port "$port"
-        } else {
-            Write-Host "No se configurará SSL."
-        }
-    } elseif ($op -eq "2"){
-        Write-Host "= Nginx =" -ForegroundColor DarkCyan
-        $ftpServer = "10.0.0.17"
-        $ftpUser = "ftpwindows"
-        $ftpPass = "windows"
-        $directory = "Nginx"
-        listar_http -ftpServer $ftpServer -ftpUser $ftpUser -ftpPass $ftpPass -directory $directory
-        do {
-            $op2 = Read-Host "Elija la version que desea instalar: (1-2)"
-            if ([string]::IsNullOrEmpty($op2)){
-                return
-            }
-            if ($op2 -match "^[12]$") {
-                break
-            } else {
-                Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
-            }
-        } while ($true)
+    # Obtener la lista de archivos disponibles en la carpeta seleccionada
+    $files = listar_http -ftpServer $ftpServer -ftpUser $ftpUser -ftpPass $ftpPass -directory $selectedService
 
-        if ($op2 -eq "1") {
-            $port = solicitar_puerto "Ingresa el puerto para Nginx (1024-65535)"
-            if ([string]::IsNullOrEmpty($port)){
-                return
-            }
-            Write-Host "Descargando Nginx 1.26.3..."
-            $version = "1.26.3"
-            conf_nginx_ftp -port "$port" -version "$version"
-        } else {
-            $port = solicitar_puerto "Ingresa el puerto para Nginx (1024-65535)"
-            if ([string]::IsNullOrEmpty($port)){
-                return
-            }
-            Write-Host "Descargando Nginx 1.27.4..."
-            $version = "1.27.4"
-            conf_nginx_ftp -port "$port" -version "$version"
-        }
-
-        menu_cert
-        do {
-            $op2 = Read-Host "Elija una opcion (1-2)"
-            if ($op2 -match "^[12]$") {
-                break
-            } else {
-                Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
-            }
-        } while ($true)
-                                
-        Write-Host "Opcion seleccionada: $op2"
-                                
-        if ($op2 -eq "1") {
-            Write-Host "Configurando certificado SSL..."
-            cert_nginx -port "$port"
-        } else {
-            Write-Host "No se configurara SSL."
-        }
-        
+    # Asegurar que la variable es un array
+    if ($files -isnot [System.Array]) {
+        $files = @($files)
     }
 
+    # Filtrar elementos vacíos y limpiar nombres
+    $files = $files | Where-Object { ($_ -match '\S') -and ($_ -ne $null) } | ForEach-Object { $_.Trim() }
+
+    if ($files.Count -eq 0) {
+        Write-Host "No se encontraron archivos en el directorio." -ForegroundColor Red
+        return
+    }
+
+    # Mostrar la lista correctamente con foreach
+    $index = 1
+    foreach ($file in $files) {
+        Write-Host "$index. $file"
+        $index++
+    }
+
+    do {
+        $op2 = Read-Host "Elija la version que desea instalar (1-$($files.Count)), o escriba 0 para salir"
+        if ($op2 -eq "0") { 
+            Write-Host "Saliendo..." -ForegroundColor Yellow
+            return
+        }
+        if ($op2 -match "^\d+$" -and [int]$op2 -le $files.Count) {
+            break
+        } else {
+            Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
+        }
+    } while ($true)
+
+    # Asignar versión seleccionada
+    $selectedFile = $files[$op2 -1]
+    $version = extraer_version -fileName "$selectedFile"
+
+    if ($null -eq $version) {
+        return
+    }
+
+    Write-Host "Instalador $selectedFile seleccionado de $selectedService" -ForegroundColor DarkCyan
+
+    $port = solicitar_puerto "Ingrese el puerto para $selectedService (1024-65535)"
+    if ([string]::IsNullOrEmpty($port)){ return }
+
+    # Descargar e instalar el servicio
+    Write-Host "Descargando $selectedService $version..."
+    if ($selectedService -eq "Apache") {
+        conf_apache_ftp -port "$port" -version "$version"
+    } elseif ($selectedService -eq "Nginx") {
+        conf_nginx_ftp -port "$port" -version "$version"
+    } else {
+        Write-Host "Servicio desconocido: $selectedService" -ForegroundColor Red
+        return
+    }
+
+    # Configurar SSL opcionalmente
+    menu_cert
+    do {
+        $opSSL = Read-Host "Desea configurar SSL? (1-Si, 2-No)"
+        if ($opSSL -match "^[12]$") {
+            break
+        } else {
+            Write-Host "Opción no valida. Intente de nuevo" -ForegroundColor Red
+        }
+    } while ($true)
+
+    if ($opSSL -eq "1") {
+        Write-Host "Configurando certificado SSL..."
+        if ($selectedService -eq "Apache") {
+            cert_apache -port "$port"
+        } elseif ($selectedService -eq "Nginx") {
+            cert_nginx -port "$port"
+        }
+    } else {
+        Write-Host "No se configurara SSL."
+    }
+
+    Write-Host "$selectedService instalado y configurado en el puerto $port" -ForegroundColor Green
 }
