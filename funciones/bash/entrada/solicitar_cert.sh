@@ -5,7 +5,7 @@ solicitar_cert(){
     cert=0  # Marcar que no se ha solicitado un certificado
     while true; do
 
-    read -p "Elija una opción (1-3): " op
+    read -p "Elija una opción (1-2): " op
     case "$op" in
         1)
             cert=1  # Marcar que se ha solicitado un certificado

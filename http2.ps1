@@ -26,49 +26,17 @@ while ($true) {
                             continue
                         }
                         conf_IIS -port "$port"
-                        menu_cert
-                        do {
-                            $op2 = Read-Host "Elija una opcion (1-2)"
-                            if ($op2 -match "^[12]$") {
-                                break
-                            } else {
-                                Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
-                            }
-                        } while ($true)
-                        
-                        if ($op2 -eq "1") {
-                            Write-Host "Configurando certificado SSL..."
-                            cert_IIS -port "$port"
-                        } else {
-                            Write-Host "No se configurara SSL."
-                        }
                     }
                     "2" {
                         $version= obtener_apache
-                        $op2 = Read-Host "Selecciona 1 para instalar Apache"
-                        while ($true){
+                        do{
+                            $op2 = Read-Host "Selecciona 1 para instalar Apache"
                             if ($op2 -eq "1") {
                                 $port = solicitar_puerto "Ingresa el puerto para Apache (1024-65535)"
                                 if ([string]::IsNullOrEmpty($port)){
-                                    continue
+                                    break
                                 }
                                 conf_apache -port $port -version "$version"
-                                menu_cert
-                                do {
-                                    $op2 = Read-Host "Elija una opcion (1-2)"
-                                    if ($op2 -match "^[12]$") {
-                                        break
-                                    } else {
-                                        Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
-                                    }
-                                } while ($true)
-                                
-                                if ($op2 -eq "1") {
-                                    Write-Host "Configurando certificado SSL..."
-                                    cert_apache -port "$port"
-                                } else {
-                                    Write-Host "No se configurará SSL."
-                                }
                                 break
                             } elseif ($op2 -eq "2") {
                                 Write-Host "Regresando al menu principal." -ForegroundColor Yellow
@@ -76,7 +44,7 @@ while ($true) {
                             } else {
                                 Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
                             }
-                        }
+                        } while ($true)
                     }
                     "3" {
                         $version= obtener_nginx
@@ -99,28 +67,11 @@ while ($true) {
                                 break
                             } elseif ($op2 -eq "3"){
                                 Write-Host "Regresando al menu principal." -ForegroundColor Yellow
-                                return
-                            } else {
-                                Write-Host "Opcion no valida. Intente de nuevo." -ForegroundColor Yellow
-                            }
-                        } while ($true)
-
-                        menu_cert
-                        do {
-                            $op2 = Read-Host "Elija una opcion (1-2)"
-                            if ($op2 -match "^[12]$") {
                                 break
                             } else {
-                                Write-Host "Opcion no valida. Intente de nuevo" -ForegroundColor Red
+                                Write-Host "Opcion no valida. Intente de nuevo." -ForegroundColor Red
                             }
                         } while ($true)
-                                            
-                        if ($op2 -eq "1") {
-                            Write-Host "Configurando certificado SSL..."
-                            cert_nginx -port "$port"
-                        } else {
-                            Write-Host "No se configurará SSL."
-                        }
                     }
                     "4" {
                         exit
