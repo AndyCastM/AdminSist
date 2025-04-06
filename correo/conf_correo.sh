@@ -70,7 +70,7 @@ conf_correo(){
     install_dir="/var/www/html/squirrelmail"
 
     cd /var/www/html/
-    wget https://sourceforge.net/projects/squirrelmail/files/stable/1.4.22/squirrelmail-webmail-1.4.22.zip
+    wget -4 https://sourceforge.net/projects/squirrelmail/files/stable/1.4.22/squirrelmail-webmail-1.4.22.zip
     unzip squirrelmail-webmail-1.4.22.zip
     sudo mv squirrelmail-webmail-1.4.22 squirrelmail
     sudo chown -R www-data:www-data "$install_dir/"

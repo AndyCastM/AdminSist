@@ -44,6 +44,10 @@ while true; do
     if [ "$opc" -eq 1 ]; then
         echo "Ingresa el nombre de usuario:"
         user=$(solicitar_user)
+        if [ -z "$user" ]; then
+            echo "Regresando a menú principal..."
+            continue
+        fi
         crear_user "$user" 
     elif [ "$opc" -eq 2 ]; then
         echo "Saliendo..."
