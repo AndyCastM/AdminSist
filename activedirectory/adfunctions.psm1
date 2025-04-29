@@ -1,6 +1,6 @@
 #Variables globales
-$global:dominio = "aprobados.com"
-$global:netbios = "APROBADOS"
+$global:dominio = "andycast.local"
+$global:netbios = "ANDYCAST"
 $global:ou1 = "cuates"
 $global:ou2 = "no cuates"
 
@@ -49,7 +49,7 @@ function solicitar_usuario {
         $usuario = Read-Host $mensaje
 
         if (-not (validar_usuario $usuario)) {
-            Write-Host "Usuario no válido. Intenta de nuevo." -ForegroundColor Red
+            Write-Host "Usuario no valido. Intenta de nuevo. Debe tener al menos 5 caracteres" -ForegroundColor Red
         } elseif (usuario_existe $usuario) {
             Write-Host "El usuario '$usuario' ya existe en Active Directory. Intenta de nuevo." -ForegroundColor Red
         } else {
@@ -92,8 +92,8 @@ function solicitar_contra {
     )
 
     while ($true) {
-        $contra1 = Read-Host "Ingresa la contraseña para el usuario '$usuario'" -AsSecureString
-        $contra2 = Read-Host "Confirma la contraseña" -AsSecureString
+        $contra1 = Read-Host "Ingresa la contrasenia para el usuario '$usuario'" -AsSecureString
+        $contra2 = Read-Host "Confirma la contrasenia" -AsSecureString
 
         # Convertir SecureString a texto plano para validación
         $plain1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
@@ -104,40 +104,60 @@ function solicitar_contra {
         )
 
         if ($plain1 -ne $plain2) {
-            Write-Host "Las contraseñas no coinciden. Intenta de nuevo." -ForegroundColor Red
-        } elseif ($plain1.Length -lt 5 -or
+            Write-Host "Las contrasenias no coinciden. Intenta de nuevo." -ForegroundColor Red
+        } elseif ($plain1.Length -lt 10 -or
                   $plain1 -notmatch '[A-Z]' -or
                   $plain1 -notmatch '[a-z]' -or
                   $plain1 -notmatch '[0-9]' -or
                   $plain1 -notmatch '[^a-zA-Z0-9]') {
-            Write-Host "La contraseña no es valida. Debe tener al menos 5 caracteres, incluir una mayuscula, una minuscula, un numero y un simbolo especial." -ForegroundColor Red
+            Write-Host "La contrasenia no es valida. Debe tener al menos 10 caracteres, incluir una mayuscula, una minuscula, un numero y un simbolo especial." -ForegroundColor Red
         } else {
-            Write-Host "Contraseña valida." -ForegroundColor Green
+            Write-Host "Contrasenia valida." -ForegroundColor Green
             return $contra1  # Devuelve la contraseña como SecureString
         }
     }
 }
 
+function menu_ou(){
+    while ($true){
+        Write-Host "1. Cuates"
+        Write-Host "2. No cuates"
+        $opc = Read-Host "Elija una opcion de OU"
+        if ([string]::IsNullOrEmpty($opc)){
+            return
+        }
+        switch ($opc){
+            "1" {
+                return "cuates"
+            }
+            "2"{
+                return "no cuates"
+            }
+            default {
+                Write-Host "Opcion no valida. Intente de nuevo." -ForegroundColor Red
+            }
+        }
+    }
+}
 function crear_usuario {
     param (
-        [string]$usario,
+        [string]$usuario,
         [string]$ou
     )
 
     # Solicitar la contraseña (secure)
-    $contra = solicitar_contra -usuario $usuario
+    $securePass = solicitar_contra -usuario $usuario
 
     $dnOu = "OU=$ou,$global:baseDN"
     
     if (Get-ADOrganizationalUnit -LDAPFilter "(distinguishedName=$dnOu)" -ErrorAction SilentlyContinue) {
-        $securePass = ConvertTo-SecureString $contra -AsPlainText -Force
-
         New-ADUser `
             -Name $usuario `
             -SamAccountName $usuario `
             -UserPrincipalName "$usuario@$global:dominio" `
             -AccountPassword $securePass `
             -Enabled $true `
+            -ChangePasswordAtLogon $false `
             -Path $dnOu
 
         Write-Host "Usuario '$usuario' creado en OU '$ou'." -ForegroundColor Green

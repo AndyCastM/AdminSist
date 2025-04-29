@@ -1,6 +1,10 @@
 # Importamos el modulo donde estaran las funciones de Active Directory
 Import-Module "C:\Users\Administrador\activedirectory\adfunctions.psm1" -Force
 
+# Fijamos la IP
+$ip = "10.0.0.12"
+#New-NetIPAddress -IPAddress $ip -InterfaceAlias "Ethernet 2" -PrefixLength 24
+
 # Verificamos si el rol de Active Directory esta instalado
 $adRole = Get-WindowsFeature -Name AD-Domain-Services
 
@@ -29,15 +33,20 @@ while ($true) {
         "2" {
             $usuario = solicitar_usuario "Ingrese nombre de usuario"
             if ([string]::IsNullOrEmpty($usuario)){
-                continue
+                break
             }
-            Write-Host "Creando Usuarios..." -ForegroundColor Green
-            crear_usuario "$usuario"
-            Write-Host "Usuarios creados exitosamente." -ForegroundColor Green
+            $ou = menu_ou
+            if ([string]::IsNullOrEmpty($ou)){
+                break
+            }
+            Write-Host "Creando Usuario..." -ForegroundColor Green
+            # Falta preguntar por el OU
+            crear_usuario "$usuario" "$ou"
+            Write-Host "Usuario creado exitosamente." -ForegroundColor Green
         }
         "3" {
             Write-Host "Saliendo..." -ForegroundColor Green
-            break
+            exit
         }
         default {
             Write-Host "Opcion no valida. Intente de nuevo." -ForegroundColor Red
