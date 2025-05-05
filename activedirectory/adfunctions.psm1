@@ -1,6 +1,6 @@
 #Variables globales
-$global:dominio = "andycast.local"
-$global:netbios = "ANDYCAST"
+$global:dominio = "plan-tres.com"
+$global:netbios = "PLAN-TRES"
 $global:ou1 = "cuates"
 $global:ou2 = "no cuates"
 

@@ -3,7 +3,7 @@ Import-Module "C:\Users\Administrador\activedirectory\adfunctions.psm1" -Force
 
 # Fijamos la IP
 $ip = "10.0.0.12"
-#New-NetIPAddress -IPAddress $ip -InterfaceAlias "Ethernet 2" -PrefixLength 24
+New-NetIPAddress -IPAddress $ip -InterfaceAlias "Ethernet 2" -PrefixLength 24
 
 # Verificamos si el rol de Active Directory esta instalado
 $adRole = Get-WindowsFeature -Name AD-Domain-Services
