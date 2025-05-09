@@ -157,7 +157,7 @@ function crear_usuario {
             -UserPrincipalName "$usuario@$global:dominio" `
             -AccountPassword $securePass `
             -Enabled $true `
-            -ChangePasswordAtLogon $false `
+            -ChangePasswordAtLogon $true `
             -Path $dnOu
 
         Write-Host "Usuario '$usuario' creado en OU '$ou'." -ForegroundColor Green

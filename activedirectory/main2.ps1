@@ -28,6 +28,15 @@ while ($true) {
         }
         "2" {
             # Aqui van a ir las llamadas a las configuraciones
+            Write-Host "Realizando configuraciones..." -ForegroundColor Green
+            restriccion_archivos
+            restriccion_aplicaciones
+            passwords_seguras
+            habilitar_auditorias
+            
+            #Actualizar las políticas de grupo (aplicar cambios)
+            Invoke-GPUpdate
+            gpupdate /force
         }
         "3" {
             Write-Host "Saliendo..." -ForegroundColor Green
