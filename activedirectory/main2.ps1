@@ -29,6 +29,7 @@ while ($true) {
         "2" {
             # Aqui van a ir las llamadas a las configuraciones
             Write-Host "Realizando configuraciones..." -ForegroundColor Green
+            restriccion_horarios
             restriccion_archivos
             restriccion_aplicaciones
             passwords_seguras
