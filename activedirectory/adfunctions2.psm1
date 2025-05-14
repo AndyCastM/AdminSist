@@ -97,7 +97,7 @@ function restriccion_horarios(){
 function restriccion_archivos(){
     # Variables
     $sharePath = "C:\Profiles\"
-    $serverName = "DC"  #CAMBIAR ESTO A TU NOMBRE DE SERVER
+    $serverName = "DC"  
     $shareName = "Profiles"
 
     ################################### GRUPO 1- CUATES ######################################### 
