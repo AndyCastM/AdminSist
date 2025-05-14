@@ -44,7 +44,6 @@ montar_apache(){
     docker pull httpd
     docker run -d --name apache_server -p 8080:80 httpd
     echo "Apache montado correctamente. Ingrese con http://10.0.0.16:8080"
-
 }
 
 modificar_apache(){
@@ -57,20 +56,23 @@ modificar_apache(){
     docker run -d --name apache_personalizado -p 8081:80 -v $(pwd)/index.html:/usr/local/apache2/htdocs/index.html httpd
     cd ..
     echo "Apache modificado correctamente. Ingrese con http://10.0.0.16:8081"
-
 }
 
 crear_dockerfile(){
     verificar_docker || return 1
     cd apachev2
     # Crear un Dockerfile para personalizar la imagen de Apache
+    # FROM: Especifica la imagen base desde la cual construir
+    # COPY: Copia archivos desde el host al contenedor
     touch Dockerfile
     sudo tee -a Dockerfile > /dev/null <<EOF
     # Dockerfile
-    FROM httpd
+    FROM httpd:latest
     COPY index.html /usr/local/apache2/htdocs/index.html
 EOF
+    # Construir la imagen personalizada, el punto indica que el Dockerfile está en el directorio actual
     docker build -t apache_personalizado .
+    # Corremos la imagen personalizada
     docker run -d --name apache_clonado -p 8082:80 apache_personalizado
     echo "Imagen creada correctamente. Ingrese con http://10.0.0.16:8082"
 }
@@ -111,7 +113,7 @@ EOF
 comunicacion_contenedores(){
     verificar_docker || return 1
     # Entramos al contenedor de postgres_alumnos 
-    # con el cliento postgresql nos conextamos al contenedor postgres_profes, pasamos las credenciales
+    # con el cliento postgresql nos conectamos al contenedor postgres_profes, pasamos las credenciales
     # y ejecutamos una consulta
     docker exec -it postgres_alumnos bash -c 'PGPASSWORD=profe123 psql -h postgres_profes -U profe -d profes -c "SELECT * FROM profesores;"'
 }
@@ -119,7 +121,7 @@ comunicacion_contenedores(){
 comunicacion_contenedores2(){
     verificar_docker || return 1
     # Entramos al contenedor de postgres_profes
-    # con el cliento postgresql nos conextamos al contenedor postgres_alumnos, pasamos las credenciales
+    # con el cliento postgresql nos conectamos al contenedor postgres_alumnos, pasamos las credenciales
     # y ejecutamos una consulta
     docker exec -it postgres_profes bash -c 'PGPASSWORD=alumno123 psql -h postgres_alumnos -U alumno -d alumnos -c "SELECT * FROM alumnos;"'
 }

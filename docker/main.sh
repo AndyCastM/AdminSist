@@ -19,7 +19,7 @@ while true; do
     echo "6) Verificar contenedor desde alumno hacia profesor"
     echo "7) Verificar contenedor desde profesor hacia alumno"
     echo "8) Salir"
-    read -p "Elija una opción (1-5): " op2
+    read -p "Elija una opción (1-8): " op2
     case "$op2" in
         1)
             echo "Opción 1 seleccionada: Instalar Docker"
