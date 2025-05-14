@@ -84,13 +84,13 @@ contenedores_postgres(){
     docker run -d --name postgres_profes --network red_alumnos_profes \
       -e POSTGRES_DB=profes \
       -e POSTGRES_USER=profe \
-      -e POSTGRES_PASSWORD=clave123 \
+      -e POSTGRES_PASSWORD=profe123 \
       postgres
 
     docker run -d --name postgres_alumnos --network red_alumnos_profes \
       -e POSTGRES_DB=alumnos \
       -e POSTGRES_USER=alumno \
-      -e POSTGRES_PASSWORD=clave123 \
+      -e POSTGRES_PASSWORD=alumno123 \
       postgres
 
     # Espera a que se inicien los contenedores
@@ -110,14 +110,16 @@ EOF
 
 comunicacion_contenedores(){
     verificar_docker || return 1
-    docker run -it --rm --network red_alumnos_profes \
-  -e PGPASSWORD=clave123 \
-  postgres psql -h postgres_profes -U profe -d profes -c "SELECT * FROM profesores;"
+    # Entramos al contenedor de postgres_alumnos 
+    # con el cliento postgresql nos conextamos al contenedor postgres_profes, pasamos las credenciales
+    # y ejecutamos una consulta
+    docker exec -it postgres_alumnos bash -c 'PGPASSWORD=profe123 psql -h postgres_profes -U profe -d profes -c "SELECT * FROM profesores;"'
 }
 
 comunicacion_contenedores2(){
     verificar_docker || return 1
-    docker run -it --rm --network red_alumnos_profes \
-  -e PGPASSWORD=clave123 \
-  postgres psql -h postgres_alumnos -U alumno -d alumnos -c "SELECT * FROM alumnos;"
+    # Entramos al contenedor de postgres_profes
+    # con el cliento postgresql nos conextamos al contenedor postgres_alumnos, pasamos las credenciales
+    # y ejecutamos una consulta
+    docker exec -it postgres_profes bash -c 'PGPASSWORD=alumno123 psql -h postgres_alumnos -U alumno -d alumnos -c "SELECT * FROM alumnos;"'
 }
