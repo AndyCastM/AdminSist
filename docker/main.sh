@@ -16,8 +16,9 @@ while true; do
     echo "3) Personalizar imagen de Apache"
     echo "4) Clonar la imagen de Apache"
     echo "5) Crear conexión entre contenedores"
-    echo "6) Verificar contenedores"
-    echo "7) Salir"
+    echo "6) Verificar contenedor desde alumno hacia profesor"
+    echo "7) Verificar contenedor desde profesor hacia alumno"
+    echo "8) Salir"
     read -p "Elija una opción (1-5): " op2
     case "$op2" in
         1)
@@ -45,10 +46,16 @@ while true; do
             contenedores_postgres
             ;;
         6)
-            echo "Opción 6 seleccionada: Verificar contenedores"
+            echo "Opción 6 seleccionada: Verificar contenedor desde alumno hacia profesor"
+            echo "Verificando contenedor desde alumno hacia profesor..."
             comunicacion_contenedores
             ;;
         7)
+            echo "Opción 7 seleccionada: Verificar contenedor desde profesor hacia alumno"
+            echo "Verificando contenedor desde profesor hacia alumno..."
+            comunicacion_contenedores2
+            ;;
+        8)
             echo "Opción 7 seleccionada: Salir"
             echo "Saliendo..."
             exit 0
