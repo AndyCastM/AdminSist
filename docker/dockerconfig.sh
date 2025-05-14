@@ -2,6 +2,12 @@
 
 usuarioact=andycast 
 
+# Flags para validaciones
+flag_apache=".apache_montado"
+flag_personalizado=".apache_personalizado"
+flag_clonado=".apache_clonado"
+flag_conexion=".apache_conexiones"
+
 # Función auxiliar para verificar si Docker está instalado
 verificar_docker(){
     if ! command -v docker &> /dev/null; then
@@ -40,14 +46,31 @@ instalar_docker(){
 montar_apache(){
     verificar_docker || return 1
     # Buscar y montar una imagen de Apache
+    if [ -f $flag_apache ]; then
+        echo "Apache ya está montado"
+        return
+    fi
+
     docker search httpd
     docker pull httpd
     docker run -d --name apache_server -p 8080:80 httpd
     echo "Apache montado correctamente. Ingrese con http://10.0.0.16:8080"
+    touch $flag_apache
 }
 
 modificar_apache(){
     verificar_docker || return 1
+    if [ -f $flag_apache ]; then
+        continue
+    else
+        echo "Realiza el paso 2 primero..."
+        return
+    fi
+
+    if [ -f $flag_personalizado ]; then
+        echo "Ya se hizo una previa modificación..."
+        return
+    fi
     # Modificar el index.html de apache
     mkdir apachev2
     cd apachev2
@@ -56,10 +79,23 @@ modificar_apache(){
     docker run -d --name apache_personalizado -p 8081:80 -v $(pwd)/index.html:/usr/local/apache2/htdocs/index.html httpd
     cd ..
     echo "Apache modificado correctamente. Ingrese con http://10.0.0.16:8081"
+    touch $flag_personalizado
 }
 
 crear_dockerfile(){
     verificar_docker || return 1
+    if [ -f $flag_personalizado ]; then
+        continue
+    else
+        echo "Realiza el paso 3 primero..."
+        return
+    fi
+
+    if [ -f $flag_clonado ]; then
+        echo "Ya se creo previamente una imagen personalizada..."
+        return
+    fi
+
     cd apachev2
     # Crear un Dockerfile para personalizar la imagen de Apache
     # FROM: Especifica la imagen base desde la cual construir
@@ -75,11 +111,17 @@ EOF
     # Corremos la imagen personalizada
     docker run -d --name apache_clonado -p 8082:80 apache_personalizado
     echo "Imagen creada correctamente. Ingrese con http://10.0.0.16:8082"
+    touch $flag_clonado
 }
 
 # Crea contenedores con PostgreSQL y red para comunicación
 contenedores_postgres(){
     verificar_docker || return 1
+    if [ -f $flag_conexion ]; then
+        echo "Ya se creo previamente una conexion con sus contenedores..."
+        return
+    fi
+
     docker pull postgres
     docker network create red_alumnos_profes
 
@@ -108,10 +150,18 @@ EOF
 CREATE TABLE alumnos(id SERIAL PRIMARY KEY, nombre TEXT);
 INSERT INTO alumnos(nombre) VALUES ('Andrea'), ('Paola'), ('Eduardo'), ('Santiago'), ('Humberto'), ('Paulina');
 EOF
+
+    touch $flag_conexion
 }
 
 comunicacion_contenedores(){
     verificar_docker || return 1
+    if [ -f $flag_conexion ]; then
+        continue
+    else
+        echo "Realiza el paso 5 primero..."
+        return
+    fi
     # Entramos al contenedor de postgres_alumnos 
     # con el cliento postgresql nos conectamos al contenedor postgres_profes, pasamos las credenciales
     # y ejecutamos una consulta
@@ -119,6 +169,12 @@ comunicacion_contenedores(){
 }
 
 comunicacion_contenedores2(){
+    if [ -f $flag_conexion ]; then
+        continue
+    else
+        echo "Realiza el paso 5 primero..."
+        return
+    fi
     verificar_docker || return 1
     # Entramos al contenedor de postgres_profes
     # con el cliento postgresql nos conectamos al contenedor postgres_alumnos, pasamos las credenciales
