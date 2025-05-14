@@ -42,8 +42,7 @@ modificar_apache(){
 }
 
 crear_dockerfile(){
-    mkdir apache_dockerfile
-    cd apache_dockerfile
+    cd apachev2
     # Crear un Dockerfile para personalizar la imagen de Apache
     touch Dockerfile
     sudo tee -a Dockerfile > /dev/null <<EOF
@@ -76,12 +75,12 @@ contenedores_postgres(){
     sleep 5
 
     # Crear tablas y datos
-    docker exec -i postgres_profes psql -U usuario -d profes <<EOF
+    docker exec -i postgres_profes psql -U profe -d profes <<EOF
 CREATE TABLE profesores(id SERIAL PRIMARY KEY, nombre TEXT);
 INSERT INTO profesores(nombre) VALUES ('Herman'), ('Mirsa');
 EOF
 
-    docker exec -i postgres_alumnos psql -U usuario -d alumnos <<EOF
+    docker exec -i postgres_alumnos psql -U alumno -d alumnos <<EOF
 CREATE TABLE alumnos(id SERIAL PRIMARY KEY, nombre TEXT);
 INSERT INTO alumnos(nombre) VALUES ('Andrea'), ('Paola');
 EOF
