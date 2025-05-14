@@ -10,7 +10,7 @@ instalar_docker(){
     sudo apt update
     apt-cache policy docker-ce
     sudo apt install docker-ce
-    sudo systemctl status docker
+    #sudo systemctl status docker
 
     # Agregar el usuario actual al grupo docker
     sudo usermod -aG docker ${usuarioact}
