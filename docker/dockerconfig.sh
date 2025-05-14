@@ -60,9 +60,7 @@ montar_apache(){
 
 modificar_apache(){
     verificar_docker || return 1
-    if [ -f $flag_apache ]; then
-        continue
-    else
+    if [ ! -f $flag_apache ]; then
         echo "Realiza el paso 2 primero..."
         return
     fi
@@ -84,9 +82,7 @@ modificar_apache(){
 
 crear_dockerfile(){
     verificar_docker || return 1
-    if [ -f $flag_personalizado ]; then
-        continue
-    else
+    if [ ! -f $flag_personalizado ]; then
         echo "Realiza el paso 3 primero..."
         return
     fi
@@ -156,9 +152,7 @@ EOF
 
 comunicacion_contenedores(){
     verificar_docker || return 1
-    if [ -f $flag_conexion ]; then
-        continue
-    else
+    if [ ! -f $flag_conexion ]; then
         echo "Realiza el paso 5 primero..."
         return
     fi
@@ -169,12 +163,11 @@ comunicacion_contenedores(){
 }
 
 comunicacion_contenedores2(){
-    if [ -f $flag_conexion ]; then
-        continue
-    else
+    if [ ! -f $flag_conexion ]; then
         echo "Realiza el paso 5 primero..."
         return
     fi
+    
     verificar_docker || return 1
     # Entramos al contenedor de postgres_profes
     # con el cliento postgresql nos conectamos al contenedor postgres_alumnos, pasamos las credenciales
