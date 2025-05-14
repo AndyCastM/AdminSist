@@ -71,7 +71,7 @@ crear_dockerfile(){
     COPY index.html /usr/local/apache2/htdocs/index.html
 EOF
     docker build -t apache_personalizado .
-    docker run -d --name apache_clonado -p 8082:80 apache_personalizado
+    docker run -d --name apache_clonado -p 8082:80 httpd
     echo "Imagen creada correctamente. Ingrese con http://10.0.0.16:8082"
 }
 
