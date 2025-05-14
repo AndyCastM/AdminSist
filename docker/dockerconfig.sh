@@ -2,7 +2,23 @@
 
 usuarioact=andycast 
 
+# Función auxiliar para verificar si Docker está instalado
+verificar_docker(){
+    if ! command -v docker &> /dev/null; then
+        echo "Docker no está instalado. Ejecute primero la opción 1."
+        return 1
+    fi
+    return 0
+}
+
 instalar_docker(){
+    # Verificar si Docker ya está instalado
+    if command -v docker &> /dev/null; then
+        echo "Docker ya está instalado."
+        docker --version
+        return 0
+    fi
+
     sudo apt update 
     sudo apt install apt-transport-https ca-certificates curl software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -13,14 +29,16 @@ instalar_docker(){
     #sudo systemctl status docker
 
     # Agregar el usuario actual al grupo docker
+    echo "Agregando el usuario '${usuarioact}' al grupo docker..."
     sudo usermod -aG docker ${usuarioact}
     newgrp docker
 
-    # Confirmar que el 
+    # Confirmar que el usuario ha sido agregado al grupo
     id -nG
 }
 
 montar_apache(){
+    verificar_docker || return 1
     # Buscar y montar una imagen de Apache
     docker search httpd
     docker pull httpd
@@ -30,6 +48,7 @@ montar_apache(){
 }
 
 modificar_apache(){
+    verificar_docker || return 1
     # Modificar el index.html de apache
     mkdir apachev2
     cd apachev2
@@ -42,6 +61,7 @@ modificar_apache(){
 }
 
 crear_dockerfile(){
+    verificar_docker || return 1
     cd apachev2
     # Crear un Dockerfile para personalizar la imagen de Apache
     touch Dockerfile
@@ -57,6 +77,7 @@ EOF
 
 # Crea contenedores con PostgreSQL y red para comunicación
 contenedores_postgres(){
+    verificar_docker || return 1
     docker network create red_postgres
 
     docker run -d --name postgres_profes --network red_postgres \
@@ -87,6 +108,7 @@ EOF
 }
 
 comunicacion_contenedores(){
+    verificar_docker || return 1
     # Instalar dblink en alumnos
 docker exec -i postgres_alumnos psql -U alumno -d alumnos <<EOF
 CREATE EXTENSION IF NOT EXISTS dblink;
@@ -103,6 +125,7 @@ EOF
 }
 
 comunicacion_contenedores2(){
+    verificar_docker || return 1
     # Instalar dblink en profes
 docker exec -i postgres_profes psql -U profe -d profes <<EOF
 CREATE EXTENSION IF NOT EXISTS dblink;
