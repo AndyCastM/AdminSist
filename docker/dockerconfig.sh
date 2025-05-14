@@ -78,15 +78,16 @@ EOF
 # Crea contenedores con PostgreSQL y red para comunicación
 contenedores_postgres(){
     verificar_docker || return 1
-    docker network create red_postgres
+    docker pull postgres
+    docker network create red_alumnos_profes
 
-    docker run -d --name postgres_profes --network red_postgres \
+    docker run -d --name postgres_profes --network red_alumnos_profes \
       -e POSTGRES_DB=profes \
       -e POSTGRES_USER=profe \
       -e POSTGRES_PASSWORD=clave123 \
       postgres
 
-    docker run -d --name postgres_alumnos --network red_postgres \
+    docker run -d --name postgres_alumnos --network red_alumnos_profes \
       -e POSTGRES_DB=alumnos \
       -e POSTGRES_USER=alumno \
       -e POSTGRES_PASSWORD=clave123 \
@@ -109,34 +110,14 @@ EOF
 
 comunicacion_contenedores(){
     verificar_docker || return 1
-    # Instalar dblink en alumnos
-docker exec -i postgres_alumnos psql -U alumno -d alumnos <<EOF
-CREATE EXTENSION IF NOT EXISTS dblink;
-EOF
-
-# Ejecutar un SELECT usando dblink desde alumnos hacia profes
-docker exec -i postgres_alumnos psql -U alumno -d alumnos <<EOF
-SELECT * FROM dblink(
-    'host=postgres_profes user=profe password=clave123 dbname=profes',
-    'SELECT id, nombre FROM profesores'
-) AS resultado(id INT, nombre TEXT);
-EOF
-
+    docker run -it --rm --network red_alumnos_profes \
+  -e PGPASSWORD=clave123 \
+  postgres psql -h postgres_profes -U profe -d profes -c "SELECT * FROM profesores;"
 }
 
 comunicacion_contenedores2(){
     verificar_docker || return 1
-    # Instalar dblink en profes
-docker exec -i postgres_profes psql -U profe -d profes <<EOF
-CREATE EXTENSION IF NOT EXISTS dblink;
-EOF
-
-# Ejecutar un SELECT usando dblink desde profes hacia alumnos
-docker exec -i postgres_profes psql -U profe -d profes <<EOF
-SELECT * FROM dblink(
-    'host=postgres_alumnos user=alumno password=clave123 dbname=alumnos',
-    'SELECT id, nombre FROM alumnos'
-) AS resultado(id INT, nombre TEXT);
-EOF
-
+    docker run -it --rm --network red_alumnos_profes \
+  -e PGPASSWORD=clave123 \
+  postgres psql -h postgres_alumnos -U alumno -d alumnos -c "SELECT * FROM alumnos;"
 }
