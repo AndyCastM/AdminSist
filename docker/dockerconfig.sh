@@ -44,6 +44,7 @@ instalar_docker(){
 }
 
 montar_apache(){
+    puerto=8080
     verificar_docker || return 1
     # Buscar y montar una imagen de Apache
     if [ -f $flag_apache ]; then
@@ -53,12 +54,13 @@ montar_apache(){
 
     docker search httpd
     docker pull httpd
-    docker run -d --name apache_server -p 8080:80 httpd
+    docker run -d --name apache_server -p $puerto:80 httpd
     echo "Apache montado correctamente. Ingrese con http://10.0.0.16:8080"
     touch $flag_apache
 }
 
 modificar_apache(){
+    puerto=8083
     verificar_docker || return 1
     if [ ! -f $flag_apache ]; then
         echo "Realiza el paso 2 primero..."
@@ -74,13 +76,14 @@ modificar_apache(){
     cd apachev2
     echo "<h1>Hola desde Docker, yo personalice esto profe Herman, saludos</h1>" > index.html
 
-    docker run -d --name apache_personalizado -p 8081:80 -v $(pwd)/index.html:/usr/local/apache2/htdocs/index.html httpd
+    docker run -d --name apache_personalizado -p $puerto:80 -v $(pwd)/index.html:/usr/local/apache2/htdocs/index.html httpd
     cd ..
     echo "Apache modificado correctamente. Ingrese con http://10.0.0.16:8081"
     touch $flag_personalizado
 }
 
 crear_dockerfile(){
+    puerto=8085
     verificar_docker || return 1
     if [ ! -f $flag_personalizado ]; then
         echo "Realiza el paso 3 primero..."
@@ -105,7 +108,7 @@ EOF
     # Construir la imagen personalizada, el punto indica que el Dockerfile está en el directorio actual
     docker build -t apache_personalizado .
     # Corremos la imagen personalizada
-    docker run -d --name apache_clonado -p 8082:80 apache_personalizado
+    docker run -d --name apache_clonado -p $puerto:80 apache_personalizado
     echo "Imagen creada correctamente. Ingrese con http://10.0.0.16:8082"
     touch $flag_clonado
 }
